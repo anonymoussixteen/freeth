@@ -122,8 +122,12 @@ def timer (t):
      except SystemExit:
            sys.exit("                     \r")
 def write(text) :
-    print (f"{etalic}{text}{etalic}\n")
-
+   for word in text:
+       print (f"{etalic}{word}{etalic}", end ="", flush=True)
+       sleep(0.05)
+   sys.stdout.write('\r')
+   sleep(1.5)
+   print (f"{' '.center(46, ' ')}", end ='\r')
 def slow(text) :
    for word in text:
        print (word, end ="", flush=True)
@@ -458,9 +462,7 @@ def _main():
         write (f"  Roll Completed This Hour . . . ")
         seconds = re.search("""\$\('.free_play_time_remaining'\).countdown\(\{
                         until: \+(.*),""", data[0])[1]
-        minutes = int(seconds)/60
-        write ("  Left minutes: "+str(minutes))
-        sleep(60*5)
+        timer(int(seconds))
     token = data[1]['csrf_token']
     client_seed = re.search('<input id="next_client_seed" type="text" value="(.*)"/>',data[0])[1]
     payload = f"csrf_token={token}&op=free_play&fingerprint=64d03558eaca2570eadbadc362365989&client_seed={client_seed}&fingerprint2=2526924704&pwc=1&h_recaptcha_response="
@@ -468,9 +470,7 @@ def _main():
     data = post ("https://freeth.in/", payload, headers)
     if 'Someone has already played from this IP in the last hour.' in data:
         minutes = re.search("You need to wait for (.*) minutes",data)[1]
-        write ("  Left minutes: "+str(minutes))
-        write ("  Sleeping for 5 minutes...!")
-        sleep(60*5)
+        timer(int(minutes)*60)
     elif 's:' in data:
         data= data.split(':')
         number= data[1]
@@ -482,8 +482,7 @@ def _main():
         slow (f"{cyan}{x} {white}- Lucky Number: {green}{number}{white} Won: {green}{earned} ETH{etalic}{reset} \n")
         slow (f"         - {white}Balance: {yellow}{balance} ETH{white} Tokens Left: {cyan}{tokens}{etalic}\n")
         slow (f'{cyan+ "-".center(49, "-")+reset}\n')
-        write ("  Sleeping for 5 minutes...!")
-        sleep(60*5)
+        timer(60*60)
 
 
 def main():
